@@ -1,0 +1,133 @@
+--Diferenciando JOINS
+--JOINS juntam dados da mesma tabela, ou de tabelas diferentes.
+--Podendo ser:
+
+--INNER JOIN; Com ele juntamos informaçõe internas das tabelas, se existerem valores que em uma tabela tabela tem, mas em outra não, só apareceram os valores que tem nas duas. EXEMPLO: se na tabela1 tivermos linhas com id do 1 ao 5, e na tabela2 tiver do 1 ao 5, mas o 2 não tiver, nessa função, só aparecerá as linhas 1,3,4,5.
+
+--OUTER JOINS (RIGHT or LEFT); Aqui juntamos tabelas de diferentes direções, como no exemplo anterior se fizer o LEFT OUTER JOIN, obteremos os valores das 5 linhas, e o valor da linha 2 que não tem na tabela2, aparecerá NULL. 
+--No RIGHT OUTER JOIN, acontecerá como no INNER JOIN.
+
+--SELF JOIN; Junta dados de uma mesma tabela.
+
+
+
+-- Aqui estão as 2 primeiras tabelas - vamos ver quais colunas e dados nas linhas que temos em comum que podemos unir
+SELECT *
+FROM employee_demographics;
+
+SELECT *
+FROM employee_salary;
+
+-- Vamos começar com uma junção interna - as junções internas retornam linhas que são iguais em ambas as colunas
+
+-- Como temos as mesmas colunas, precisamos especificar de qual tabela elas vêm
+SELECT *
+FROM employee_demographics
+JOIN employee_salary
+	ON employee_demographics.employee_id = employee_salary.employee_id;
+
+-- notou que Ron Swanson não está nos resultados? Isso ocorre porque ele não tem uma ID de funcionário na tabela demográfica. Ele se recusou a dar sua data de nascimento, idade ou sexo
+
+-- use aliasing!
+SELECT *
+FROM employee_demographics dem
+INNER JOIN employee_salary sal
+	ON dem.employee_id = sal.employee_id;
+
+
+-- OUTER JOINS
+
+-- Para junções externas, temos uma junção esquerda e uma direita
+-- uma junção à esquerda pegará tudo da tabela da esquerda, mesmo que não haja correspondência na junção, mas retornará apenas correspondências da tabela da direita
+-- O exato oposto é verdadeiro para uma junção à direita
+
+SELECT *
+FROM employee_salary sal
+LEFT JOIN employee_demographics dem
+	ON dem.employee_id = sal.employee_id;
+
+-- então você notará que temos tudo, desde a tabela da esquerda ou a tabela de salários. Mesmo que não haja páreo para Ron Swanson. 
+-- Como não há correspondência na tabela certa, são apenas nulos
+
+-- se apenas mudarmos isso para uma junção à direita, basicamente parece uma junção interna
+-- Isso porque estamos pegando tudo da tabela demográfica e apenas corresponde à esquerda ou à tabela salarial. Já que eles têm todas as correspondências
+-- Parece uma espécie de junção interna
+SELECT *
+FROM employee_salary sal
+RIGHT JOIN employee_demographics dem
+	ON dem.employee_id = sal.employee_id;
+
+
+
+-- Self Join
+
+-- Uma auto-junção é onde você amarra uma tabela a si mesma
+
+SELECT *
+FROM employee_salary;
+
+-- o que poderíamos fazer é um Papai Noel secreto para que a pessoa com o ID mais alto seja o Papai Noel secreto da pessoa
+
+
+SELECT *
+FROM employee_salary emp1
+JOIN employee_salary emp2
+	ON emp1.employee_id = emp2.employee_id
+    ;
+
+-- Agora vamos mudar para dar a eles o Papai Noel secreto
+SELECT *
+FROM employee_salary emp1
+JOIN employee_salary emp2
+	ON emp1.employee_id + 1  = emp2.employee_id
+    ;
+
+
+
+SELECT emp1.employee_id as emp_santa, emp1.first_name as santa_first_name, emp1.last_name as santa_last_name, emp2.employee_id, emp2.first_name, emp2.last_name
+FROM employee_salary emp1
+JOIN employee_salary emp2
+	ON emp1.employee_id + 1  = emp2.employee_id
+    ;
+
+-- Então Leslie é o Papai Noel secreto de Ron e assim por diante - Mark Brandanowitz não ganhou um Papai Noel secreto, mas ele não merece um porque ele partiu o coração de Ann, então está tudo bem
+
+
+
+
+
+
+-- Associando várias tabelas
+
+-- Agora temos em outra mesa que podemos juntar - vamos dar uma olhada nela
+SELECT * 
+FROM parks_and_recreation.parks_departments;
+
+
+SELECT *
+FROM employee_demographics dem
+INNER JOIN employee_salary sal
+	ON dem.employee_id = sal.employee_id
+JOIN parks_departments dept
+	ON dept.department_id = sal.dept_id;
+
+-- Agora observe quando fizemos isso, já que é uma junção interna, ele se livrou de Andy porque ele não fazia parte de nenhum departamento
+
+-- Se fizermos uma junção à esquerda, ainda o incluiríamos porque estamos tirando tudo da tabela da esquerda, que é a tabela de salários neste caso
+SELECT *
+FROM employee_demographics dem
+INNER JOIN employee_salary sal
+	ON dem.employee_id = sal.employee_id
+LEFT JOIN parks_departments dept
+	ON dept.department_id = sal.dept_id;
+
+
+
+
+
+
+
+
+
+
+
